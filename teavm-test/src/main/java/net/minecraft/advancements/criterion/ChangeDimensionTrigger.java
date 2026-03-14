@@ -2,7 +2,8 @@ package net.minecraft.advancements.criterion;
 
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.util.JSONUtils;
@@ -24,7 +25,10 @@ public class ChangeDimensionTrigger extends AbstractCriterionTrigger<ChangeDimen
       return new ChangeDimensionTrigger.Instance(entityPredicate, registrykey, registrykey1);
    }
 
-   public void testForAll(ServerPlayerEntity player, RegistryKey<World> fromWorld, RegistryKey<World> toWorld) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void testForAll(PlayerEntity player, RegistryKey<World> fromWorld, RegistryKey<World> toWorld) {
       this.triggerListeners(player, (p_233550_2_) -> {
          return p_233550_2_.test(fromWorld, toWorld);
       });
