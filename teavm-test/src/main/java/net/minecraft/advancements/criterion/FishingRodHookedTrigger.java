@@ -4,7 +4,8 @@ import com.google.gson.JsonObject;
 import java.util.Collection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for Web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.ConditionArrayParser;
@@ -27,10 +28,13 @@ public class FishingRodHookedTrigger extends AbstractCriterionTrigger<FishingRod
       return new FishingRodHookedTrigger.Instance(entityPredicate, itempredicate, entitypredicate$andpredicate, itempredicate1);
    }
 
-   public void trigger(ServerPlayerEntity player, ItemStack rod, FishingBobberEntity entity, Collection<ItemStack> items) {
+   /**
+    * Updated for Web: Uses PlayerEntity to avoid server-side dependency issues.
+    */
+   public void trigger(PlayerEntity player, ItemStack rod, FishingBobberEntity entity, Collection<ItemStack> items) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, (Entity)(entity.func_234607_k_() != null ? entity.func_234607_k_() : entity));
-      this.triggerListeners(player, (p_234658_3_) -> {
-         return p_234658_3_.test(rod, lootcontext, items);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(rod, lootcontext, items);
       });
    }
 
