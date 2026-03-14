@@ -10,7 +10,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// We use the base PlayerEntity instead of the heavy ServerPlayerEntity where possible
+import net.minecraft.entity.player.PlayerEntity; 
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.LootContext;
 
@@ -31,7 +32,6 @@ public abstract class AbstractCriterionTrigger<T extends CriterionInstance> impl
             this.triggerListeners.remove(playerAdvancementsIn);
          }
       }
-
    }
 
    public final void removeAllListeners(PlayerAdvancements playerAdvancementsIn) {
@@ -45,11 +45,21 @@ public abstract class AbstractCriterionTrigger<T extends CriterionInstance> impl
       return this.deserializeTrigger(object, entitypredicate$andpredicate, conditions);
    }
 
-   protected void triggerListeners(ServerPlayerEntity serverPlayer, Predicate<T> testTrigger) {
-      PlayerAdvancements playeradvancements = serverPlayer.getAdvancements();
+   /**
+    * Rewritten for Web: We handle the trigger logic using a generic PlayerEntity
+    * to avoid bringing in server-only network code.
+    */
+   protected void triggerListeners(PlayerEntity player, Predicate<T> testTrigger) {
+      // In Eaglercraft/TeaVM, we often need a custom way to access advancements
+      // since the standard ServerPlayerEntity methods might be missing.
+      PlayerAdvancements playeradvancements = getAdvancementsForPlayer(player);
+      
+      if (playeradvancements == null) return;
+
       Set<ICriterionTrigger.Listener<T>> set = this.triggerListeners.get(playeradvancements);
       if (set != null && !set.isEmpty()) {
-         LootContext lootcontext = EntityPredicate.getLootContext(serverPlayer, serverPlayer);
+         // LootContext is used to check if conditions (like being in a certain biome) are met
+         LootContext lootcontext = EntityPredicate.getLootContext(player, player);
          List<ICriterionTrigger.Listener<T>> list = null;
 
          for(ICriterionTrigger.Listener<T> listener : set) {
@@ -58,7 +68,6 @@ public abstract class AbstractCriterionTrigger<T extends CriterionInstance> impl
                if (list == null) {
                   list = Lists.newArrayList();
                }
-
                list.add(listener);
             }
          }
@@ -68,7 +77,12 @@ public abstract class AbstractCriterionTrigger<T extends CriterionInstance> impl
                listener1.grantCriterion(playeradvancements);
             }
          }
-
       }
+   }
+
+   // A helper to safely get advancements in a single-threaded web environment
+   private PlayerAdvancements getAdvancementsForPlayer(PlayerEntity player) {
+      // In a full port, you'd link this to the Minecraft.getInstance().player advancements
+      return null; // Placeholder until PlayerAdvancements.java is ported
    }
 }
