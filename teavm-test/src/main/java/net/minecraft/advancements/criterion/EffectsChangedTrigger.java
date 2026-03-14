@@ -1,7 +1,8 @@
 package net.minecraft.advancements.criterion;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.util.ResourceLocation;
@@ -18,7 +19,10 @@ public class EffectsChangedTrigger extends AbstractCriterionTrigger<EffectsChang
       return new EffectsChangedTrigger.Instance(entityPredicate, mobeffectspredicate);
    }
 
-   public void trigger(ServerPlayerEntity player) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void trigger(PlayerEntity player) {
       this.triggerListeners(player, (p_226524_1_) -> {
          return p_226524_1_.test(player);
       });
@@ -36,7 +40,10 @@ public class EffectsChangedTrigger extends AbstractCriterionTrigger<EffectsChang
          return new EffectsChangedTrigger.Instance(EntityPredicate.AndPredicate.ANY_AND, effects);
       }
 
-      public boolean test(ServerPlayerEntity player) {
+      /**
+       * Updated for Web: Uses PlayerEntity.
+       */
+      public boolean test(PlayerEntity player) {
          return this.effects.test(player);
       }
 
