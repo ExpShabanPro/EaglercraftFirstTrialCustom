@@ -4,7 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity to avoid bringing in server-only network code
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
@@ -38,7 +39,10 @@ public class BeeNestDestroyedTrigger extends AbstractCriterionTrigger<BeeNestDes
       }
    }
 
-   public void test(ServerPlayerEntity player, Block block, ItemStack stack, int beesContained) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void test(PlayerEntity player, Block block, ItemStack stack, int beesContained) {
       this.triggerListeners(player, (p_226220_3_) -> {
          return p_226220_3_.test(block, stack, beesContained);
       });
