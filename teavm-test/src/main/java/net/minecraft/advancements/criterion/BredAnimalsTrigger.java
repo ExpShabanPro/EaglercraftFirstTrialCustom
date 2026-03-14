@@ -4,7 +4,8 @@ import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import net.minecraft.entity.AgeableEntity;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity to avoid bringing in server-only network code
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.loot.LootContext;
@@ -24,7 +25,10 @@ public class BredAnimalsTrigger extends AbstractCriterionTrigger<BredAnimalsTrig
       return new BredAnimalsTrigger.Instance(entityPredicate, entitypredicate$andpredicate, entitypredicate$andpredicate1, entitypredicate$andpredicate2);
    }
 
-   public void trigger(ServerPlayerEntity player, AnimalEntity parent1, AnimalEntity parent2, @Nullable AgeableEntity child) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void trigger(PlayerEntity player, AnimalEntity parent1, AnimalEntity parent2, @Nullable AgeableEntity child) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, parent1);
       LootContext lootcontext1 = EntityPredicate.getLootContext(player, parent2);
       LootContext lootcontext2 = child != null ? EntityPredicate.getLootContext(player, child) : null;
