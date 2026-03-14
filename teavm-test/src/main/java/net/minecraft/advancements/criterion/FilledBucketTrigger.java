@@ -1,7 +1,8 @@
 package net.minecraft.advancements.criterion;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
@@ -19,9 +20,12 @@ public class FilledBucketTrigger extends AbstractCriterionTrigger<FilledBucketTr
       return new FilledBucketTrigger.Instance(entityPredicate, itempredicate);
    }
 
-   public void trigger(ServerPlayerEntity player, ItemStack stack) {
-      this.triggerListeners(player, (p_226627_1_) -> {
-         return p_226627_1_.test(stack);
+   /**
+    * Updated for Web: Uses PlayerEntity instead of ServerPlayerEntity.
+    */
+   public void trigger(PlayerEntity player, ItemStack stack) {
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(stack);
       });
    }
 
