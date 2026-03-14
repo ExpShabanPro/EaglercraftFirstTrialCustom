@@ -3,7 +3,8 @@ package net.minecraft.advancements.criterion;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import javax.annotation.Nullable;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.potion.Potion;
@@ -30,7 +31,10 @@ public class BrewedPotionTrigger extends AbstractCriterionTrigger<BrewedPotionTr
       return new BrewedPotionTrigger.Instance(entityPredicate, potion);
    }
 
-   public void trigger(ServerPlayerEntity player, Potion potionIn) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void trigger(PlayerEntity player, Potion potionIn) {
       this.triggerListeners(player, (p_226301_1_) -> {
          return p_226301_1_.test(potionIn);
       });
