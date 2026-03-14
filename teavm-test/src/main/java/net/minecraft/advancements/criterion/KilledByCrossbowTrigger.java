@@ -37,8 +37,8 @@ public class KilledByCrossbowTrigger extends AbstractCriterionTrigger<KilledByCr
          list.add(EntityPredicate.getLootContext(player, entity));
       }
 
-      this.triggerListeners(player, (p_234940_2_) -> {
-         return p_234940_2_.test(list, set.size());
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(list, set.size());
       });
    }
 
@@ -68,7 +68,7 @@ public class KilledByCrossbowTrigger extends AbstractCriterionTrigger<KilledByCr
          return new KilledByCrossbowTrigger.Instance(EntityPredicate.AndPredicate.ANY_AND, aentitypredicate$andpredicate, bounds);
       }
 
-      public boolean test(Collection<LootContext> contexts, int bounds) {
+      public boolean test(Collection<LootContext> contexts, int uniqueTypes) {
          if (this.entities.length > 0) {
             List<LootContext> list = Lists.newArrayList(contexts);
 
@@ -91,7 +91,7 @@ public class KilledByCrossbowTrigger extends AbstractCriterionTrigger<KilledByCr
             }
          }
 
-         return this.bounds.test(bounds);
+         return this.bounds.test(uniqueTypes);
       }
 
       public JsonObject serialize(ConditionArraySerializer conditions) {
