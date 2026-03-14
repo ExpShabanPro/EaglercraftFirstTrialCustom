@@ -10,7 +10,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.loot.FishingPredicate;
@@ -25,7 +26,8 @@ import net.minecraft.tags.ITag;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.server.ServerWorld;
+// Swapped ServerWorld for World
+import net.minecraft.world.World;
 
 public class EntityPredicate {
    public static final EntityPredicate ANY = new EntityPredicate(EntityTypePredicate.ANY, DistancePredicate.ANY, LocationPredicate.ANY, MobEffectsPredicate.ANY, NBTPredicate.ANY, EntityFlagsPredicate.ALWAYS_TRUE, EntityEquipmentPredicate.ANY, PlayerPredicate.ANY, FishingPredicate.field_234635_a_, (String)null, (ResourceLocation)null);
@@ -77,11 +79,17 @@ public class EntityPredicate {
       this.catType = catType;
    }
 
-   public boolean test(ServerPlayerEntity player, @Nullable Entity entity) {
-      return this.test(player.getServerWorld(), player.getPositionVec(), entity);
+   /**
+    * Updated for Web: Uses PlayerEntity instead of ServerPlayerEntity.
+    */
+   public boolean test(PlayerEntity player, @Nullable Entity entity) {
+      return this.test(player.world, player.getPositionVec(), entity);
    }
 
-   public boolean test(ServerWorld world, @Nullable Vector3d vector, @Nullable Entity entity) {
+   /**
+    * Updated for Web: Uses World instead of ServerWorld.
+    */
+   public boolean test(World world, @Nullable Vector3d vector, @Nullable Entity entity) {
       if (this == ANY) {
          return true;
       } else if (entity == null) {
@@ -175,8 +183,15 @@ public class EntityPredicate {
       }
    }
 
-   public static LootContext getLootContext(ServerPlayerEntity player, Entity entity) {
-      return (new LootContext.Builder(player.getServerWorld())).withParameter(LootParameters.THIS_ENTITY, entity).withParameter(LootParameters.field_237457_g_, player.getPositionVec()).withRandom(player.getRNG()).build(LootParameterSets.field_237454_j_);
+   /**
+    * Updated for Web: Uses PlayerEntity and client-safe world access.
+    */
+   public static LootContext getLootContext(PlayerEntity player, Entity entity) {
+      return (new LootContext.Builder(player.world))
+               .withParameter(LootParameters.THIS_ENTITY, entity)
+               .withParameter(LootParameters.field_237457_g_, player.getPositionVec())
+               .withRandom(player.getRNG())
+               .build(LootParameterSets.field_237454_j_);
    }
 
    public static class AndPredicate {
