@@ -7,6 +7,10 @@ import javax.annotation.Nullable;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.math.MathHelper;
 
+/**
+ * Predicate used to check distance between two points in the world.
+ * This class is compatible with the web port as it relies on pure math and standard utilities.
+ */
 public class DistancePredicate {
    public static final DistancePredicate ANY = new DistancePredicate(MinMaxBounds.FloatBound.UNBOUNDED, MinMaxBounds.FloatBound.UNBOUNDED, MinMaxBounds.FloatBound.UNBOUNDED, MinMaxBounds.FloatBound.UNBOUNDED, MinMaxBounds.FloatBound.UNBOUNDED);
    private final MinMaxBounds.FloatBound x;
