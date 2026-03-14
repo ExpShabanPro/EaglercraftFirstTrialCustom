@@ -1,7 +1,8 @@
 package net.minecraft.advancements.criterion;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.ConditionArrayParser;
@@ -22,7 +23,10 @@ public class ConsumeItemTrigger extends AbstractCriterionTrigger<ConsumeItemTrig
       return new ConsumeItemTrigger.Instance(entityPredicate, ItemPredicate.deserialize(json.get("item")));
    }
 
-   public void trigger(ServerPlayerEntity player, ItemStack item) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void trigger(PlayerEntity player, ItemStack item) {
       this.triggerListeners(player, (p_226325_1_) -> {
          return p_226325_1_.test(item);
       });
