@@ -15,7 +15,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.tags.ITag;
@@ -221,7 +220,7 @@ public class ItemPredicate {
       }
 
       public static ItemPredicate.Builder create() {
-         return new ItemPredicate.Builder();
+         return new Builder();
       }
 
       public ItemPredicate.Builder item(IItemProvider provider) {
@@ -234,7 +233,7 @@ public class ItemPredicate {
          return this;
       }
 
-      public ItemPredicate.Builder nbt(CompoundNBT nbt) {
+      public ItemPredicate.Builder nbt(net.minecraft.nbt.CompoundNBT nbt) {
          this.nbt = new NBTPredicate(nbt);
          return this;
       }
