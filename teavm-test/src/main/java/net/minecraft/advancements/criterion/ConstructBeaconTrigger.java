@@ -1,7 +1,8 @@
 package net.minecraft.advancements.criterion;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.tileentity.BeaconTileEntity;
@@ -19,7 +20,10 @@ public class ConstructBeaconTrigger extends AbstractCriterionTrigger<ConstructBe
       return new ConstructBeaconTrigger.Instance(entityPredicate, minmaxbounds$intbound);
    }
 
-   public void trigger(ServerPlayerEntity player, BeaconTileEntity beacon) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void trigger(PlayerEntity player, BeaconTileEntity beacon) {
       this.triggerListeners(player, (p_226308_1_) -> {
          return p_226308_1_.test(beacon);
       });
