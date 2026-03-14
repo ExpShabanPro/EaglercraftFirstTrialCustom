@@ -8,6 +8,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.JSONUtils;
 
+/**
+ * Predicate for checking various entity state flags.
+ * Verified for Web Port: Uses base Entity classes which are available in the client.
+ */
 public class EntityFlagsPredicate {
    public static final EntityFlagsPredicate ALWAYS_TRUE = (new EntityFlagsPredicate.Builder()).build();
    @Nullable
@@ -39,6 +43,7 @@ public class EntityFlagsPredicate {
       } else if (this.swimming != null && entity.isSwimming() != this.swimming) {
          return false;
       } else {
+         // Logic check for baby status using LivingEntity check
          return this.baby == null || !(entity instanceof LivingEntity) || ((LivingEntity)entity).isChild() == this.baby;
       }
    }
@@ -66,7 +71,6 @@ public class EntityFlagsPredicate {
       if (bool != null) {
          jsonObject.addProperty(name, bool);
       }
-
    }
 
    public JsonElement serialize() {
