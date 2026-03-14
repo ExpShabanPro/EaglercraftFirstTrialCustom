@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.loot.LootContext;
@@ -24,7 +25,10 @@ public class ChanneledLightningTrigger extends AbstractCriterionTrigger<Channele
       return new ChanneledLightningTrigger.Instance(entityPredicate, aentitypredicate$andpredicate);
    }
 
-   public void trigger(ServerPlayerEntity player, Collection<? extends Entity> entityTriggered) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void trigger(PlayerEntity player, Collection<? extends Entity> entityTriggered) {
       List<LootContext> list = entityTriggered.stream().map((p_233674_1_) -> {
          return EntityPredicate.getLootContext(player, p_233674_1_);
       }).collect(Collectors.toList());
