@@ -1,8 +1,6 @@
 package net.minecraft.client;
 
 import com.mojang.authlib.properties.PropertyMap;
-import java.io.File;
-import java.net.Proxy;
 import javax.annotation.Nullable;
 import net.minecraft.client.renderer.ScreenSize;
 import net.minecraft.client.resources.FolderResourceIndex;
@@ -10,6 +8,8 @@ import net.minecraft.client.resources.ResourceIndex;
 import net.minecraft.util.Session;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+// NOTE: We removed java.io.File and java.net.Proxy because they don't work in browsers!
 
 @OnlyIn(Dist.CLIENT)
 public class GameConfiguration {
@@ -29,20 +29,24 @@ public class GameConfiguration {
 
    @OnlyIn(Dist.CLIENT)
    public static class FolderInformation {
-      public final File gameDir;
-      public final File resourcePacksDir;
-      public final File assetsDir;
+      // Changed from File to String for Web compatibility
+      public final String gameDir;
+      public final String resourcePacksDir;
+      public final String assetsDir;
       @Nullable
       public final String assetIndex;
 
-      public FolderInformation(File mcDataDirIn, File resourcePacksDirIn, File assetsDirIn, @Nullable String assetIndexIn) {
+      public FolderInformation(String mcDataDirIn, String resourcePacksDirIn, String assetsDirIn, @Nullable String assetIndexIn) {
          this.gameDir = mcDataDirIn;
          this.resourcePacksDir = resourcePacksDirIn;
          this.assetsDir = assetsDirIn;
          this.assetIndex = assetIndexIn;
       }
 
+      // We still return a ResourceIndex, but it will be a Web-compatible version 
+      // once we fix ResourceIndex.java later.
       public ResourceIndex getAssetsIndex() {
+         // In a browser, these 'new' calls will eventually use a Virtual File System
          return (ResourceIndex)(this.assetIndex == null ? new FolderResourceIndex(this.assetsDir) : new ResourceIndex(this.assetsDir, this.assetIndex));
       }
    }
@@ -81,9 +85,12 @@ public class GameConfiguration {
       public final Session session;
       public final PropertyMap userProperties;
       public final PropertyMap profileProperties;
-      public final Proxy proxy;
+      
+      // Changed from java.net.Proxy to Object to avoid import crashes.
+      // Web browsers handle proxies automatically!
+      public final Object proxy; 
 
-      public UserInformation(Session sessionIn, PropertyMap userPropertiesIn, PropertyMap profilePropertiesIn, Proxy proxyIn) {
+      public UserInformation(Session sessionIn, PropertyMap userPropertiesIn, PropertyMap profilePropertiesIn, Object proxyIn) {
          this.session = sessionIn;
          this.userProperties = userPropertiesIn;
          this.profileProperties = profilePropertiesIn;
