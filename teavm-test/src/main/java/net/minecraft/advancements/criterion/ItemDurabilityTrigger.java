@@ -1,7 +1,8 @@
 package net.minecraft.advancements.criterion;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for Web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
@@ -21,9 +22,12 @@ public class ItemDurabilityTrigger extends AbstractCriterionTrigger<ItemDurabili
       return new ItemDurabilityTrigger.Instance(entityPredicate, itempredicate, minmaxbounds$intbound, minmaxbounds$intbound1);
    }
 
-   public void trigger(ServerPlayerEntity player, ItemStack itemIn, int newDurability) {
-      this.triggerListeners(player, (p_226653_2_) -> {
-         return p_226653_2_.test(itemIn, newDurability);
+   /**
+    * Updated for Web: Uses PlayerEntity instead of ServerPlayerEntity.
+    */
+   public void trigger(PlayerEntity player, ItemStack itemIn, int newDurability) {
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(itemIn, newDurability);
       });
    }
 
