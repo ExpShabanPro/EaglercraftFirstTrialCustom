@@ -5,6 +5,10 @@ import net.minecraft.advancements.ICriterionInstance;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.util.ResourceLocation;
 
+/**
+ * Base class for all advancement criterion instances.
+ * This class handles the common 'player' condition present in almost all triggers.
+ */
 public abstract class CriterionInstance implements ICriterionInstance {
    private final ResourceLocation criterion;
    private final EntityPredicate.AndPredicate playerCondition;
@@ -14,6 +18,7 @@ public abstract class CriterionInstance implements ICriterionInstance {
       this.playerCondition = playerCondition;
    }
 
+   @Override
    public ResourceLocation getId() {
       return this.criterion;
    }
@@ -22,13 +27,17 @@ public abstract class CriterionInstance implements ICriterionInstance {
       return this.playerCondition;
    }
 
+   /**
+    * Serializes the condition to JSON for saving/loading advancements.
+    */
    public JsonObject serialize(ConditionArraySerializer conditions) {
       JsonObject jsonobject = new JsonObject();
       jsonobject.add("player", this.playerCondition.serializeConditions(conditions));
       return jsonobject;
    }
 
+   @Override
    public String toString() {
-      return "AbstractCriterionInstance{criterion=" + this.criterion + '}';
+      return "CriterionInstance{criterion=" + this.criterion + '}';
    }
 }
