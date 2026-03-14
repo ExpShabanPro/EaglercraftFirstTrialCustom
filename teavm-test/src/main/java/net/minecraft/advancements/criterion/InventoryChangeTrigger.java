@@ -5,7 +5,8 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for Web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.ConditionArrayParser;
@@ -32,7 +33,10 @@ public class InventoryChangeTrigger extends AbstractCriterionTrigger<InventoryCh
       return new InventoryChangeTrigger.Instance(entityPredicate, minmaxbounds$intbound, minmaxbounds$intbound1, minmaxbounds$intbound2, aitempredicate);
    }
 
-   public void test(ServerPlayerEntity player, PlayerInventory inventory, ItemStack stack) {
+   /**
+    * Updated for Web: Uses PlayerEntity instead of ServerPlayerEntity.
+    */
+   public void test(PlayerEntity player, PlayerInventory inventory, ItemStack stack) {
       int i = 0;
       int j = 0;
       int k = 0;
@@ -52,9 +56,9 @@ public class InventoryChangeTrigger extends AbstractCriterionTrigger<InventoryCh
       this.trigger(player, inventory, stack, i, j, k);
    }
 
-   private void trigger(ServerPlayerEntity player, PlayerInventory inventory, ItemStack stack, int full, int empty, int occupied) {
-      this.triggerListeners(player, (p_234802_5_) -> {
-         return p_234802_5_.test(inventory, stack, full, empty, occupied);
+   private void trigger(PlayerEntity player, PlayerInventory inventory, ItemStack stack, int full, int empty, int occupied) {
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(inventory, stack, full, empty, occupied);
       });
    }
 
