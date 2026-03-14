@@ -4,11 +4,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.server.ServerWorld;
+// Swapped ServerWorld for World
+import net.minecraft.world.World;
 
 public class DamageSourcePredicate {
    public static final DamageSourcePredicate ANY = DamageSourcePredicate.Builder.damageType().build();
@@ -36,11 +38,18 @@ public class DamageSourcePredicate {
       this.sourceEntity = sourceEntity;
    }
 
-   public boolean test(ServerPlayerEntity player, DamageSource source) {
-      return this.test(player.getServerWorld(), player.getPositionVec(), source);
+   /**
+    * Updated for Web: Uses PlayerEntity and calls getEntityWorld() 
+    * since we don't use ServerWorld on the client.
+    */
+   public boolean test(PlayerEntity player, DamageSource source) {
+      return this.test(player.getEntityWorld(), player.getPositionVec(), source);
    }
 
-   public boolean test(ServerWorld world, Vector3d vector, DamageSource source) {
+   /**
+    * Updated for Web: Uses World instead of ServerWorld.
+    */
+   public boolean test(World world, Vector3d vector, DamageSource source) {
       if (this == ANY) {
          return true;
       } else if (this.isProjectile != null && this.isProjectile != source.isProjectile()) {
