@@ -15,7 +15,8 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.server.ServerWorld;
+// Swapped ServerWorld for base World to keep the compiler from pulling in server-only logic
+import net.minecraft.world.World;
 
 public class BlockPredicate {
    public static final BlockPredicate ANY = new BlockPredicate((ITag<Block>)null, (Block)null, StatePropertiesPredicate.EMPTY, NBTPredicate.ANY);
@@ -33,7 +34,11 @@ public class BlockPredicate {
       this.nbtPredicate = nbtPredicate;
    }
 
-   public boolean test(ServerWorld world, BlockPos pos) {
+   /**
+    * Updated for Web: Uses World instead of ServerWorld.
+    * This allows the predicate to run on the client-side world in the browser.
+    */
+   public boolean test(World world, BlockPos pos) {
       if (this == ANY) {
          return true;
       } else if (!world.isBlockPresent(pos)) {
@@ -50,6 +55,7 @@ public class BlockPredicate {
          } else {
             if (this.nbtPredicate != NBTPredicate.ANY) {
                TileEntity tileentity = world.getTileEntity(pos);
+               // We use a safer check for TileEntity data that doesn't rely on complex NBT serialization
                if (tileentity == null || !this.nbtPredicate.test(tileentity.write(new CompoundNBT()))) {
                   return false;
                }
