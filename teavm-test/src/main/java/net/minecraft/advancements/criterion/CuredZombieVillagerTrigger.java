@@ -3,7 +3,8 @@ package net.minecraft.advancements.criterion;
 import com.google.gson.JsonObject;
 import net.minecraft.entity.merchant.villager.VillagerEntity;
 import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+// Swapped ServerPlayerEntity for PlayerEntity for web compatibility
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.ConditionArrayParser;
 import net.minecraft.loot.ConditionArraySerializer;
 import net.minecraft.loot.LootContext;
@@ -22,7 +23,10 @@ public class CuredZombieVillagerTrigger extends AbstractCriterionTrigger<CuredZo
       return new CuredZombieVillagerTrigger.Instance(entityPredicate, entitypredicate$andpredicate, entitypredicate$andpredicate1);
    }
 
-   public void trigger(ServerPlayerEntity player, ZombieEntity zombie, VillagerEntity villager) {
+   /**
+    * Updated for Web: Uses PlayerEntity to match our updated AbstractCriterionTrigger.
+    */
+   public void trigger(PlayerEntity player, ZombieEntity zombie, VillagerEntity villager) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, zombie);
       LootContext lootcontext1 = EntityPredicate.getLootContext(player, villager);
       this.triggerListeners(player, (p_233969_2_) -> {
