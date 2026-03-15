@@ -17,7 +17,7 @@ public class TickTrigger extends AbstractCriterionTrigger<TickTrigger.Instance> 
    }
 
    public void trigger(ServerPlayerEntity player) {
-      this.triggerListeners(player, (p_241523_0_) -> {
+      this.triggerListeners(player, (instance) -> {
          return true;
       });
    }
@@ -25,6 +25,10 @@ public class TickTrigger extends AbstractCriterionTrigger<TickTrigger.Instance> 
    public static class Instance extends CriterionInstance {
       public Instance(EntityPredicate.AndPredicate player) {
          super(TickTrigger.ID, player);
+      }
+      
+      public static TickTrigger.Instance create() {
+         return new TickTrigger.Instance(EntityPredicate.AndPredicate.ANY_AND);
       }
    }
 }
