@@ -11,8 +11,6 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +21,6 @@ public class AdvancementList {
    private final Set<Advancement> nonRoots = Sets.newLinkedHashSet();
    private AdvancementList.IListener listener;
 
-   @OnlyIn(Dist.CLIENT)
    private void remove(Advancement advancementIn) {
       for(Advancement advancement : advancementIn.getChildren()) {
          this.remove(advancement);
@@ -42,10 +39,8 @@ public class AdvancementList {
             this.listener.nonRootAdvancementRemoved(advancementIn);
          }
       }
-
    }
 
-   @OnlyIn(Dist.CLIENT)
    public void removeAll(Set<ResourceLocation> ids) {
       for(ResourceLocation resourcelocation : ids) {
          Advancement advancement = this.advancements.get(resourcelocation);
@@ -55,7 +50,6 @@ public class AdvancementList {
             this.remove(advancement);
          }
       }
-
    }
 
    public void loadAdvancements(Map<ResourceLocation, Advancement.Builder> advancementsIn) {
@@ -99,7 +93,6 @@ public class AdvancementList {
       LOGGER.info("Loaded {} advancements", (int)this.advancements.size());
    }
 
-   @OnlyIn(Dist.CLIENT)
    public void clear() {
       this.advancements.clear();
       this.roots.clear();
@@ -107,7 +100,6 @@ public class AdvancementList {
       if (this.listener != null) {
          this.listener.advancementsCleared();
       }
-
    }
 
    public Iterable<Advancement> getRoots() {
@@ -123,7 +115,6 @@ public class AdvancementList {
       return this.advancements.get(id);
    }
 
-   @OnlyIn(Dist.CLIENT)
    public void setListener(@Nullable AdvancementList.IListener listenerIn) {
       this.listener = listenerIn;
       if (listenerIn != null) {
@@ -135,21 +126,17 @@ public class AdvancementList {
             listenerIn.nonRootAdvancementAdded(advancement1);
          }
       }
-
    }
 
    public interface IListener {
       void rootAdvancementAdded(Advancement advancementIn);
 
-      @OnlyIn(Dist.CLIENT)
       void rootAdvancementRemoved(Advancement advancementIn);
 
       void nonRootAdvancementAdded(Advancement advancementIn);
 
-      @OnlyIn(Dist.CLIENT)
       void nonRootAdvancementRemoved(Advancement advancementIn);
 
-      @OnlyIn(Dist.CLIENT)
       void advancementsCleared();
    }
 }
