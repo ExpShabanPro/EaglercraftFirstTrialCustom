@@ -79,26 +79,18 @@ public class LocationPredicate {
          BlockPos blockpos = new BlockPos((double)x, (double)y, (double)z);
          boolean flag = world.isBlockPresent(blockpos);
          Optional<RegistryKey<Biome>> optional = world.func_241828_r().getRegistry(Registry.BIOME_KEY).getOptionalKey(world.getBiome(blockpos));
-         if (!optional.isPresent()) {
+         if (this.biome != null && (!optional.isPresent() || optional.get() != this.biome)) {
             return false;
-         } else if (this.biome == null || flag && this.biome == optional.get()) {
-            if (this.feature == null || flag && world.func_241112_a_().getStructureStart(blockpos, true, this.feature).isValid()) {
-               if (this.smokey == null || flag && this.smokey == CampfireBlock.isSmokingBlockAt(world, blockpos)) {
-                  if (!this.light.test(world, blockpos)) {
-                     return false;
-                  } else if (!this.block.test(world, blockpos)) {
-                     return false;
-                  } else {
-                     return this.fluid.test(world, blockpos);
-                  }
-               } else {
-                  return false;
-               }
-            } else {
-               return false;
-            }
+         } else if (this.feature != null && (!flag || !world.func_241112_a_().getStructureStart(blockpos, true, this.feature).isValid())) {
+            return false;
+         } else if (this.smokey != null && (!flag || this.smokey != CampfireBlock.isSmokingBlockAt(world, blockpos))) {
+            return false;
+         } else if (!this.light.test(world, blockpos)) {
+            return false;
+         } else if (!this.block.test(world, blockpos)) {
+            return false;
          } else {
-            return false;
+            return this.fluid.test(world, blockpos);
          }
       }
    }
@@ -117,8 +109,8 @@ public class LocationPredicate {
          }
 
          if (this.dimension != null) {
-            World.CODEC.encodeStart(JsonOps.INSTANCE, this.dimension).resultOrPartial(LOGGER::error).ifPresent((p_235307_1_) -> {
-               jsonobject.add("dimension", p_235307_1_);
+            World.CODEC.encodeStart(JsonOps.INSTANCE, this.dimension).resultOrPartial(LOGGER::error).ifPresent((json) -> {
+               jsonobject.add("dimension", json);
             });
          }
 
@@ -145,24 +137,28 @@ public class LocationPredicate {
       if (element != null && !element.isJsonNull()) {
          JsonObject jsonobject = JSONUtils.getJsonObject(element, "location");
          JsonObject jsonobject1 = JSONUtils.getJsonObject(jsonobject, "position", new JsonObject());
-         MinMaxBounds.FloatBound minmaxbounds$floatbound = MinMaxBounds.FloatBound.fromJson(jsonobject1.get("x"));
-         MinMaxBounds.FloatBound minmaxbounds$floatbound1 = MinMaxBounds.FloatBound.fromJson(jsonobject1.get("y"));
-         MinMaxBounds.FloatBound minmaxbounds$floatbound2 = MinMaxBounds.FloatBound.fromJson(jsonobject1.get("z"));
-         RegistryKey<World> registrykey = jsonobject.has("dimension") ? ResourceLocation.CODEC.parse(JsonOps.INSTANCE, jsonobject.get("dimension")).resultOrPartial(LOGGER::error).map((p_235310_0_) -> {
-            return RegistryKey.getOrCreateKey(Registry.WORLD_KEY, p_235310_0_);
-         }).orElse((RegistryKey<World>)null) : null;
-         Structure<?> structure = jsonobject.has("feature") ? Structure.NAME_STRUCTURE_BIMAP.get(JSONUtils.getString(jsonobject, "feature")) : null;
-         RegistryKey<Biome> registrykey1 = null;
+         MinMaxBounds.FloatBound xBound = MinMaxBounds.FloatBound.fromJson(jsonobject1.get("x"));
+         MinMaxBounds.FloatBound yBound = MinMaxBounds.FloatBound.fromJson(jsonobject1.get("y"));
+         MinMaxBounds.FloatBound zBound = MinMaxBounds.FloatBound.fromJson(jsonobject1.get("z"));
+         
+         RegistryKey<World> dimKey = jsonobject.has("dimension") ? ResourceLocation.CODEC.parse(JsonOps.INSTANCE, jsonobject.get("dimension")).resultOrPartial(LOGGER::error).map((loc) -> {
+            return RegistryKey.getOrCreateKey(Registry.WORLD_KEY, loc);
+         }).orElse(null) : null;
+         
+         Structure<?> struct = jsonobject.has("feature") ? Structure.NAME_STRUCTURE_BIMAP.get(JSONUtils.getString(jsonobject, "feature")) : null;
+         
+         RegistryKey<Biome> biomeKey = null;
          if (jsonobject.has("biome")) {
-            ResourceLocation resourcelocation = new ResourceLocation(JSONUtils.getString(jsonobject, "biome"));
-            registrykey1 = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, resourcelocation);
+            ResourceLocation res = new ResourceLocation(JSONUtils.getString(jsonobject, "biome"));
+            biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, res);
          }
 
-         Boolean obool = jsonobject.has("smokey") ? jsonobject.get("smokey").getAsBoolean() : null;
-         LightPredicate lightpredicate = LightPredicate.deserialize(jsonobject.get("light"));
-         BlockPredicate blockpredicate = BlockPredicate.deserialize(jsonobject.get("block"));
-         FluidPredicate fluidpredicate = FluidPredicate.deserialize(jsonobject.get("fluid"));
-         return new LocationPredicate(minmaxbounds$floatbound, minmaxbounds$floatbound1, minmaxbounds$floatbound2, registrykey1, structure, registrykey, obool, lightpredicate, blockpredicate, fluidpredicate);
+         Boolean isSmokey = jsonobject.has("smokey") ? jsonobject.get("smokey").getAsBoolean() : null;
+         LightPredicate light = LightPredicate.deserialize(jsonobject.get("light"));
+         BlockPredicate block = BlockPredicate.deserialize(jsonobject.get("block"));
+         FluidPredicate fluid = FluidPredicate.deserialize(jsonobject.get("fluid"));
+         
+         return new LocationPredicate(xBound, yBound, zBound, biomeKey, struct, dimKey, isSmokey, light, block, fluid);
       } else {
          return ANY;
       }
@@ -172,14 +168,10 @@ public class LocationPredicate {
       private MinMaxBounds.FloatBound x = MinMaxBounds.FloatBound.UNBOUNDED;
       private MinMaxBounds.FloatBound y = MinMaxBounds.FloatBound.UNBOUNDED;
       private MinMaxBounds.FloatBound z = MinMaxBounds.FloatBound.UNBOUNDED;
-      @Nullable
-      private RegistryKey<Biome> biome;
-      @Nullable
-      private Structure<?> feature;
-      @Nullable
-      private RegistryKey<World> dimension;
-      @Nullable
-      private Boolean smokey;
+      @Nullable private RegistryKey<Biome> biome;
+      @Nullable private Structure<?> feature;
+      @Nullable private RegistryKey<World> dimension;
+      @Nullable private Boolean smokey;
       private LightPredicate light = LightPredicate.ANY;
       private BlockPredicate block = BlockPredicate.ANY;
       private FluidPredicate fluid = FluidPredicate.ANY;
@@ -190,6 +182,16 @@ public class LocationPredicate {
 
       public LocationPredicate.Builder biome(@Nullable RegistryKey<Biome> biome) {
          this.biome = biome;
+         return this;
+      }
+
+      public LocationPredicate.Builder dimension(@Nullable RegistryKey<World> dimension) {
+         this.dimension = dimension;
+         return this;
+      }
+
+      public LocationPredicate.Builder feature(@Nullable Structure<?> feature) {
+         this.feature = feature;
          return this;
       }
 
