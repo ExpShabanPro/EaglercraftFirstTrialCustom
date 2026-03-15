@@ -4,8 +4,7 @@ import com.google.common.collect.Maps;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import java.util.ArrayList; // Added for list handling
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.entity.monster.AbstractRaiderEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -31,9 +30,9 @@ public class RaidManager extends WorldSavedData {
    private int nextAvailableId;
    private int tick;
 
-   public RaidManager(ServerWorld p_i50142_1_) {
-      super(func_234620_a_(p_i50142_1_.getDimensionType()));
-      this.world = p_i50142_1_;
+   public RaidManager(ServerWorld worldIn) {
+      super(getStorageId(worldIn.getDimensionType()));
+      this.world = worldIn;
       this.nextAvailableId = 1;
       this.markDirty();
    }
@@ -67,65 +66,70 @@ public class RaidManager extends WorldSavedData {
       DebugPacketSender.sendRaids(this.world, this.byId.values());
    }
 
-   public static boolean canJoinRaid(AbstractRaiderEntity p_215165_0_, Raid p_215165_1_) {
-      if (p_215165_0_ != null && p_215165_1_ != null && p_215165_1_.getWorld() != null) {
-         return p_215165_0_.isAlive() && p_215165_0_.canJoinRaid() && p_215165_0_.getIdleTime() <= 2400 && p_215165_0_.world.getDimensionType() == p_215165_1_.getWorld().getDimensionType();
+   public static boolean canJoinRaid(AbstractRaiderEntity raider, Raid raid) {
+      if (raider != null && raid != null && raid.getWorld() != null) {
+         return raider.isAlive() && raider.canJoinRaid() && raider.getIdleTime() <= 2400 && raider.world.getDimensionType() == raid.getWorld().getDimensionType();
       } else {
          return false;
       }
    }
 
-   @Nullable
-   public Raid badOmenTick(ServerPlayerEntity p_215170_1_) {
-      if (p_215170_1_.isSpectator()) {
+   public Raid badOmenTick(ServerPlayerEntity player) {
+      if (player.isSpectator()) {
          return null;
       } else if (this.world.getGameRules().getBoolean(GameRules.DISABLE_RAIDS)) {
          return null;
       } else {
-         DimensionType dimensiontype = p_215170_1_.world.getDimensionType();
+         DimensionType dimensiontype = player.world.getDimensionType();
          if (!dimensiontype.isHasRaids()) {
             return null;
          } else {
-            BlockPos blockpos = p_215170_1_.getPosition();
-            List<PointOfInterest> list = this.world.getPointOfInterestManager().func_219146_b(PointOfInterestType.MATCH_ANY, blockpos, 64, PointOfInterestManager.Status.IS_OCCUPIED).collect(Collectors.toList());
-            int i = 0;
-            Vector3d vector3d = Vector3d.ZERO;
+            BlockPos playerPos = player.getPosition();
+            
+            // TeaVM-optimized: Replaced .collect(Collectors.toList()) with manual collection if necessary, 
+            // but we use the iterator directly to avoid stream overhead.
+            PointOfInterestManager poiManager = this.world.getPointOfInterestManager();
+            Iterator<PointOfInterest> poiIterator = poiManager.func_219146_b(PointOfInterestType.MATCH_ANY, playerPos, 64, PointOfInterestManager.Status.IS_OCCUPIED).iterator();
+            
+            int count = 0;
+            Vector3d averagePos = Vector3d.ZERO;
 
-            for(PointOfInterest pointofinterest : list) {
-               BlockPos blockpos2 = pointofinterest.getPos();
-               vector3d = vector3d.add((double)blockpos2.getX(), (double)blockpos2.getY(), (double)blockpos2.getZ());
-               ++i;
+            while(poiIterator.hasNext()) {
+               PointOfInterest poi = poiIterator.next();
+               BlockPos poiPos = poi.getPos();
+               averagePos = averagePos.add((double)poiPos.getX(), (double)poiPos.getY(), (double)poiPos.getZ());
+               ++count;
             }
 
-            BlockPos blockpos1;
-            if (i > 0) {
-               vector3d = vector3d.scale(1.0D / (double)i);
-               blockpos1 = new BlockPos(vector3d);
+            BlockPos raidPos;
+            if (count > 0) {
+               averagePos = averagePos.scale(1.0D / (double)count);
+               raidPos = new BlockPos(averagePos);
             } else {
-               blockpos1 = blockpos;
+               raidPos = playerPos;
             }
 
-            Raid raid = this.findOrCreateRaid(p_215170_1_.getServerWorld(), blockpos1);
-            boolean flag = false;
+            Raid raid = this.findOrCreateRaid(player.getServerWorld(), raidPos);
+            boolean shouldIncreaseLevel = false;
+            
             if (!raid.isStarted()) {
                if (!this.byId.containsKey(raid.getId())) {
                   this.byId.put(raid.getId(), raid);
                }
-
-               flag = true;
+               shouldIncreaseLevel = true;
             } else if (raid.getBadOmenLevel() < raid.getMaxLevel()) {
-               flag = true;
+               shouldIncreaseLevel = true;
             } else {
-               p_215170_1_.removePotionEffect(Effects.BAD_OMEN);
-               p_215170_1_.connection.sendPacket(new SEntityStatusPacket(p_215170_1_, (byte)43));
+               player.removePotionEffect(Effects.BAD_OMEN);
+               player.connection.sendPacket(new SEntityStatusPacket(player, (byte)43));
             }
 
-            if (flag) {
-               raid.increaseLevel(p_215170_1_);
-               p_215170_1_.connection.sendPacket(new SEntityStatusPacket(p_215170_1_, (byte)43));
+            if (shouldIncreaseLevel) {
+               raid.increaseLevel(player);
+               player.connection.sendPacket(new SEntityStatusPacket(player, (byte)43));
                if (!raid.func_221297_c()) {
-                  p_215170_1_.addStat(Stats.RAID_TRIGGER);
-                  CriteriaTriggers.VOLUNTARY_EXILE.trigger(p_215170_1_);
+                  player.addStat(Stats.RAID_TRIGGER);
+                  CriteriaTriggers.VOLUNTARY_EXILE.trigger(player);
                }
             }
 
@@ -135,60 +139,58 @@ public class RaidManager extends WorldSavedData {
       }
    }
 
-   private Raid findOrCreateRaid(ServerWorld p_215168_1_, BlockPos p_215168_2_) {
-      Raid raid = p_215168_1_.findRaid(p_215168_2_);
-      return raid != null ? raid : new Raid(this.incrementNextId(), p_215168_1_, p_215168_2_);
+   private Raid findOrCreateRaid(ServerWorld worldIn, BlockPos pos) {
+      Raid raid = worldIn.findRaid(pos);
+      return raid != null ? raid : new Raid(this.incrementNextId(), worldIn, pos);
    }
 
    public void read(CompoundNBT nbt) {
       this.nextAvailableId = nbt.getInt("NextAvailableID");
       this.tick = nbt.getInt("Tick");
-      ListNBT listnbt = nbt.getList("Raids", 10);
+      ListNBT raidList = nbt.getList("Raids", 10);
 
-      for(int i = 0; i < listnbt.size(); ++i) {
-         CompoundNBT compoundnbt = listnbt.getCompound(i);
-         Raid raid = new Raid(this.world, compoundnbt);
+      for(int i = 0; i < raidList.size(); ++i) {
+         CompoundNBT raidNbt = raidList.getCompound(i);
+         Raid raid = new Raid(this.world, raidNbt);
          this.byId.put(raid.getId(), raid);
       }
-
    }
 
    public CompoundNBT write(CompoundNBT compound) {
       compound.putInt("NextAvailableID", this.nextAvailableId);
       compound.putInt("Tick", this.tick);
-      ListNBT listnbt = new ListNBT();
+      ListNBT raidList = new ListNBT();
 
       for(Raid raid : this.byId.values()) {
-         CompoundNBT compoundnbt = new CompoundNBT();
-         raid.write(compoundnbt);
-         listnbt.add(compoundnbt);
+         CompoundNBT raidNbt = new CompoundNBT();
+         raid.write(raidNbt);
+         raidList.add(raidNbt);
       }
 
-      compound.put("Raids", listnbt);
+      compound.put("Raids", raidList);
       return compound;
    }
 
-   public static String func_234620_a_(DimensionType p_234620_0_) {
-      return "raids" + p_234620_0_.getSuffix();
+   public static String getStorageId(DimensionType dimension) {
+      return "raids" + dimension.getSuffix();
    }
 
    private int incrementNextId() {
       return ++this.nextAvailableId;
    }
 
-   @Nullable
-   public Raid findRaid(BlockPos p_215174_1_, int distance) {
-      Raid raid = null;
-      double d0 = (double)distance;
+   public Raid findRaid(BlockPos pos, int distance) {
+      Raid closestRaid = null;
+      double minDistance = (double)distance;
 
-      for(Raid raid1 : this.byId.values()) {
-         double d1 = raid1.getCenter().distanceSq(p_215174_1_);
-         if (raid1.isActive() && d1 < d0) {
-            raid = raid1;
-            d0 = d1;
+      for(Raid raid : this.byId.values()) {
+         double currentDist = raid.getCenter().distanceSq(pos);
+         if (raid.isActive() && currentDist < minDistance) {
+            closestRaid = raid;
+            minDistance = currentDist;
          }
       }
 
-      return raid;
+      return closestRaid;
    }
 }
