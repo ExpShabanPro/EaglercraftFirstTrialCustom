@@ -11,7 +11,6 @@ public class MobDensityTracker {
       if (p_234998_2_ != 0.0D) {
          this.field_234997_a_.add(new MobDensityTracker.DensityEntry(p_234998_1_, p_234998_2_));
       }
-
    }
 
    public double func_234999_b_(BlockPos p_234999_1_, double p_234999_2_) {
