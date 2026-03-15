@@ -21,8 +21,8 @@ public class ShotCrossbowTrigger extends AbstractCriterionTrigger<ShotCrossbowTr
    }
 
    public void test(ServerPlayerEntity shooter, ItemStack stack) {
-      this.triggerListeners(shooter, (p_227037_1_) -> {
-         return p_227037_1_.test(stack);
+      this.triggerListeners(shooter, (instance) -> {
+         return instance.test(stack);
       });
    }
 
