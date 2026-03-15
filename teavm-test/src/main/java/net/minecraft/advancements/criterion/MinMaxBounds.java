@@ -117,7 +117,7 @@ public abstract class MinMaxBounds<T extends Number> {
 
       String s = reader.getString().substring(i, reader.getCursor());
       if (s.isEmpty()) {
-         return (T)null;
+         return null;
       } else {
          try {
             return stringToValueFunction.apply(s);
@@ -142,7 +142,7 @@ public abstract class MinMaxBounds<T extends Number> {
 
    @Nullable
    private static <T> T optionallyFormat(@Nullable T value, Function<T, T> formatterFunction) {
-      return (T)(value == null ? null : formatterFunction.apply(value));
+      return value == null ? null : formatterFunction.apply(value);
    }
 
    public static class FloatBound extends MinMaxBounds<Float> {
@@ -163,7 +163,7 @@ public abstract class MinMaxBounds<T extends Number> {
          return value == null ? null : value.doubleValue() * value.doubleValue();
       }
 
-      private FloatBound(@Nullable Float min, @Nullable Float max) {
+      public FloatBound(@Nullable Float min, @Nullable Float max) {
          super(min, max);
          this.minSquared = square(min);
          this.maxSquared = square(max);
@@ -173,11 +173,15 @@ public abstract class MinMaxBounds<T extends Number> {
          return new MinMaxBounds.FloatBound(value, (Float)null);
       }
 
+      public static MinMaxBounds.FloatBound exactly(float value) {
+         return new MinMaxBounds.FloatBound(value, value);
+      }
+
       public boolean test(float value) {
          if (this.min != null && this.min > value) {
             return false;
          } else {
-            return this.max == null || !(this.max < value);
+            return this.max == null || this.max >= value;
          }
       }
 
@@ -185,7 +189,7 @@ public abstract class MinMaxBounds<T extends Number> {
          if (this.minSquared != null && this.minSquared > value) {
             return false;
          } else {
-            return this.maxSquared == null || !(this.maxSquared < value);
+            return this.maxSquared == null || this.maxSquared >= value;
          }
       }
 
@@ -194,9 +198,7 @@ public abstract class MinMaxBounds<T extends Number> {
       }
 
       public static MinMaxBounds.FloatBound fromReader(StringReader reader) throws CommandSyntaxException {
-         return fromReader(reader, (p_211358_0_) -> {
-            return p_211358_0_;
-         });
+         return fromReader(reader, (val) -> val);
       }
 
       public static MinMaxBounds.FloatBound fromReader(StringReader reader, Function<Float, Float> valueFunction) throws CommandSyntaxException {
@@ -232,7 +234,7 @@ public abstract class MinMaxBounds<T extends Number> {
          return value == null ? null : value.longValue() * value.longValue();
       }
 
-      private IntBound(@Nullable Integer min, @Nullable Integer max) {
+      public IntBound(@Nullable Integer min, @Nullable Integer max) {
          super(min, max);
          this.minSquared = square(min);
          this.maxSquared = square(max);
@@ -259,9 +261,7 @@ public abstract class MinMaxBounds<T extends Number> {
       }
 
       public static MinMaxBounds.IntBound fromReader(StringReader reader) throws CommandSyntaxException {
-         return fromReader(reader, (p_211346_0_) -> {
-            return p_211346_0_;
-         });
+         return fromReader(reader, (val) -> val);
       }
 
       public static MinMaxBounds.IntBound fromReader(StringReader reader, Function<Integer, Integer> valueFunction) throws CommandSyntaxException {
