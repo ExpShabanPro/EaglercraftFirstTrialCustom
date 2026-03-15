@@ -27,8 +27,8 @@ public class KilledTrigger extends AbstractCriterionTrigger<KilledTrigger.Instan
 
    public void trigger(ServerPlayerEntity player, Entity entity, DamageSource source) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, entity);
-      this.triggerListeners(player, (p_226846_3_) -> {
-         return p_226846_3_.test(player, lootcontext, source);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(player, lootcontext, source);
       });
    }
 
@@ -59,7 +59,7 @@ public class KilledTrigger extends AbstractCriterionTrigger<KilledTrigger.Instan
       }
 
       public boolean test(ServerPlayerEntity player, LootContext context, DamageSource source) {
-         return !this.killingBlow.test(player, source) ? false : this.entity.testContext(context);
+         return this.killingBlow.test(player, source) && this.entity.testContext(context);
       }
 
       public JsonObject serialize(ConditionArraySerializer conditions) {
