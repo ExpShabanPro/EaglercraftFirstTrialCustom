@@ -26,8 +26,8 @@ public class PlacedBlockTrigger extends AbstractCriterionTrigger<PlacedBlockTrig
       Block block = deserializeBlock(json);
       StatePropertiesPredicate statepropertiespredicate = StatePropertiesPredicate.deserializeProperties(json.get("state"));
       if (block != null) {
-         statepropertiespredicate.forEachNotPresent(block.getStateContainer(), (p_226948_1_) -> {
-            throw new JsonSyntaxException("Block " + block + " has no property " + p_226948_1_ + ":");
+         statepropertiespredicate.forEachNotPresent(block.getStateContainer(), (property) -> {
+            throw new JsonSyntaxException("Block " + block + " has no property " + property + ":");
          });
       }
 
@@ -50,8 +50,8 @@ public class PlacedBlockTrigger extends AbstractCriterionTrigger<PlacedBlockTrig
 
    public void trigger(ServerPlayerEntity player, BlockPos pos, ItemStack item) {
       BlockState blockstate = player.getServerWorld().getBlockState(pos);
-      this.triggerListeners(player, (p_226949_4_) -> {
-         return p_226949_4_.test(blockstate, pos, player.getServerWorld(), item);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(blockstate, pos, player.getServerWorld(), item);
       });
    }
 
