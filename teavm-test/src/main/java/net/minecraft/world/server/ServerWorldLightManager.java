@@ -44,11 +44,13 @@ public class ServerWorldLightManager extends WorldLightManager implements AutoCl
    }
 
    public int tick(int toUpdateCount, boolean updateSkyLight, boolean updateBlockLight) {
-      throw (UnsupportedOperationException)Util.pauseDevMode(new UnsupportedOperationException("Ran authomatically on a different thread!"));
+      // TEAVM Modification: Removed Util.pauseDevMode as it often tries to do OS-level thread inspection/dialogs
+      throw new UnsupportedOperationException("Ran automatically on a different thread!");
    }
 
    public void onBlockEmissionIncrease(BlockPos blockPosIn, int p_215573_2_) {
-      throw (UnsupportedOperationException)Util.pauseDevMode(new UnsupportedOperationException("Ran authomatically on a different thread!"));
+      // TEAVM Modification: Removed Util.pauseDevMode as it often tries to do OS-level thread inspection/dialogs
+      throw new UnsupportedOperationException("Ran automatically on a different thread!");
    }
 
    public void checkBlock(BlockPos blockPosIn) {
