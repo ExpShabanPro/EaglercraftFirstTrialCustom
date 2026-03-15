@@ -18,6 +18,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+/**
+ * Stores the visual information for an advancement, such as how it appears in the UI and chat.
+ */
 public class DisplayInfo {
    private final ITextComponent title;
    private final ITextComponent description;
@@ -92,6 +95,9 @@ public class DisplayInfo {
       return this.hidden;
    }
 
+   /**
+    * Deserializes display information from a JsonObject.
+    */
    public static DisplayInfo deserialize(JsonObject object) {
       ITextComponent itextcomponent = ITextComponent.Serializer.getComponentFromJson(object.get("title"));
       ITextComponent itextcomponent1 = ITextComponent.Serializer.getComponentFromJson(object.get("description"));
@@ -108,6 +114,9 @@ public class DisplayInfo {
       }
    }
 
+   /**
+    * Helper to deserialize the icon ItemStack from JSON.
+    */
    private static ItemStack deserializeIcon(JsonObject object) {
       if (!object.has("item")) {
          throw new JsonSyntaxException("Unsupported icon type, currently only items are supported (add 'item' key)");
@@ -131,6 +140,9 @@ public class DisplayInfo {
       }
    }
 
+   /**
+    * Writes this display info to a PacketBuffer for network transmission.
+    */
    public void write(PacketBuffer buf) {
       buf.writeTextComponent(this.title);
       buf.writeTextComponent(this.description);
@@ -158,6 +170,9 @@ public class DisplayInfo {
       buf.writeFloat(this.y);
    }
 
+   /**
+    * Reads display info from a PacketBuffer.
+    */
    public static DisplayInfo read(PacketBuffer buf) {
       ITextComponent itextcomponent = buf.readTextComponent();
       ITextComponent itextcomponent1 = buf.readTextComponent();
@@ -167,11 +182,15 @@ public class DisplayInfo {
       ResourceLocation resourcelocation = (i & 1) != 0 ? buf.readResourceLocation() : null;
       boolean flag = (i & 2) != 0;
       boolean flag1 = (i & 4) != 0;
+      // Note: announce_to_chat is set to false here as it is usually handled server-side
       DisplayInfo displayinfo = new DisplayInfo(itemstack, itextcomponent, itextcomponent1, resourcelocation, frametype, flag, false, flag1);
       displayinfo.setPosition(buf.readFloat(), buf.readFloat());
       return displayinfo;
    }
 
+   /**
+    * Serializes this display info back into a JsonElement.
+    */
    public JsonElement serialize() {
       JsonObject jsonobject = new JsonObject();
       jsonobject.add("icon", this.serializeIcon());
