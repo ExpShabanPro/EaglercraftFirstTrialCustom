@@ -24,8 +24,8 @@ public class TargetHitTrigger extends AbstractCriterionTrigger<TargetHitTrigger.
 
    public void test(ServerPlayerEntity player, Entity projectile, Vector3d vector, int signalStrength) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, projectile);
-      this.triggerListeners(player, (p_236349_3_) -> {
-         return p_236349_3_.test(lootcontext, vector, signalStrength);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(lootcontext, vector, signalStrength);
       });
    }
 
