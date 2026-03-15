@@ -21,8 +21,8 @@ public class LevitationTrigger extends AbstractCriterionTrigger<LevitationTrigge
    }
 
    public void trigger(ServerPlayerEntity player, Vector3d startPos, int duration) {
-      this.triggerListeners(player, (p_226852_3_) -> {
-         return p_226852_3_.test(player, startPos, duration);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(player, startPos, duration);
       });
    }
 
