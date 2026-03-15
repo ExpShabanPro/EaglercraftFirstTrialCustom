@@ -60,7 +60,8 @@ public class CatSpawner implements ISpecialSpawner {
    private int func_221121_a(ServerWorld worldIn, BlockPos p_221121_2_) {
       int i = 48;
       if (worldIn.getPointOfInterestManager().getCountInRange(PointOfInterestType.HOME.getPredicate(), p_221121_2_, 48, PointOfInterestManager.Status.IS_OCCUPIED) > 4L) {
-         List<CatEntity> list = worldIn.getEntitiesWithinAABB(CatEntity.class, (new AxisAlignedBB(p_221121_2_)).grow(48.0D, 8.0D, 48.0D));
+         // TEAVM Modification: Added explicit generic type witness <CatEntity> to prevent strict javac inference failures
+         List<CatEntity> list = worldIn.<CatEntity>getEntitiesWithinAABB(CatEntity.class, (new AxisAlignedBB(p_221121_2_)).grow(48.0D, 8.0D, 48.0D));
          if (list.size() < 5) {
             return this.spawnCat(p_221121_2_, worldIn);
          }
@@ -71,7 +72,8 @@ public class CatSpawner implements ISpecialSpawner {
 
    private int func_221123_a(ServerWorld worldIn, BlockPos pos) {
       int i = 16;
-      List<CatEntity> list = worldIn.getEntitiesWithinAABB(CatEntity.class, (new AxisAlignedBB(pos)).grow(16.0D, 8.0D, 16.0D));
+      // TEAVM Modification: Added explicit generic type witness <CatEntity> to prevent strict javac inference failures
+      List<CatEntity> list = worldIn.<CatEntity>getEntitiesWithinAABB(CatEntity.class, (new AxisAlignedBB(pos)).grow(16.0D, 8.0D, 16.0D));
       return list.size() < 1 ? this.spawnCat(pos, worldIn) : 0;
    }
 
