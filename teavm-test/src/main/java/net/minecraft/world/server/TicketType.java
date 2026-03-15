@@ -48,4 +48,23 @@ public class TicketType<T> {
    public long getLifespan() {
       return this.lifespan;
    }
+
+   // TEAVM Modification: Added deterministic equals and hashCode.
+   // Without these, TicketType relies on JS memory identity hashes which are randomized.
+   // This ensures hash-based maps and sorting algorithms always resolve chunk tickets identically.
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (!(obj instanceof TicketType)) {
+         return false;
+      }
+      return this.name.equals(((TicketType<?>) obj).name);
+   }
+
+   @Override
+   public int hashCode() {
+      return this.name.hashCode();
+   }
 }
