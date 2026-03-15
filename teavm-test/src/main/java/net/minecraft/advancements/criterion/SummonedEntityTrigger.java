@@ -22,8 +22,8 @@ public class SummonedEntityTrigger extends AbstractCriterionTrigger<SummonedEnti
 
    public void trigger(ServerPlayerEntity player, Entity entity) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, entity);
-      this.triggerListeners(player, (p_227229_1_) -> {
-         return p_227229_1_.test(lootcontext);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(lootcontext);
       });
    }
 
