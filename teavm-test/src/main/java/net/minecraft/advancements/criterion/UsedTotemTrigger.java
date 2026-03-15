@@ -20,9 +20,12 @@ public class UsedTotemTrigger extends AbstractCriterionTrigger<UsedTotemTrigger.
       return new UsedTotemTrigger.Instance(entityPredicate, itempredicate);
    }
 
+   /**
+    * Triggers when the player successfully uses a totem.
+    */
    public void trigger(ServerPlayerEntity player, ItemStack item) {
-      this.triggerListeners(player, (p_227409_1_) -> {
-         return p_227409_1_.test(item);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(item);
       });
    }
 
@@ -34,10 +37,16 @@ public class UsedTotemTrigger extends AbstractCriterionTrigger<UsedTotemTrigger.
          this.item = item;
       }
 
+      /**
+       * Static helper to create a trigger instance for a specific item provider.
+       */
       public static UsedTotemTrigger.Instance usedTotem(IItemProvider item) {
          return new UsedTotemTrigger.Instance(EntityPredicate.AndPredicate.ANY_AND, ItemPredicate.Builder.create().item(item).build());
       }
 
+      /**
+       * Checks if the provided ItemStack matches the item predicate requirements.
+       */
       public boolean test(ItemStack item) {
          return this.item.test(item);
       }
