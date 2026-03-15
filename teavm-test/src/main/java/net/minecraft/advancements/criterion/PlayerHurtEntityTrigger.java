@@ -24,8 +24,8 @@ public class PlayerHurtEntityTrigger extends AbstractCriterionTrigger<PlayerHurt
 
    public void trigger(ServerPlayerEntity player, Entity entityIn, DamageSource source, float amountDealt, float amountTaken, boolean blocked) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, entityIn);
-      this.triggerListeners(player, (p_226956_6_) -> {
-         return p_226956_6_.test(player, lootcontext, source, amountDealt, amountTaken, blocked);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(player, lootcontext, source, amountDealt, amountTaken, blocked);
       });
    }
 
