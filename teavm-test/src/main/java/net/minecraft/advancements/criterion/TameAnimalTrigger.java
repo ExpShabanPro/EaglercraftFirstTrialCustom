@@ -22,8 +22,8 @@ public class TameAnimalTrigger extends AbstractCriterionTrigger<TameAnimalTrigge
 
    public void trigger(ServerPlayerEntity player, AnimalEntity entity) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, entity);
-      this.triggerListeners(player, (p_227251_1_) -> {
-         return p_227251_1_.test(lootcontext);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(lootcontext);
       });
    }
 
