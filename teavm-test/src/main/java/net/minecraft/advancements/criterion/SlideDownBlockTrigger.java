@@ -23,8 +23,8 @@ public class SlideDownBlockTrigger extends AbstractCriterionTrigger<SlideDownBlo
       Block block = deserializeBlock(json);
       StatePropertiesPredicate statepropertiespredicate = StatePropertiesPredicate.deserializeProperties(json.get("state"));
       if (block != null) {
-         statepropertiespredicate.forEachNotPresent(block.getStateContainer(), (p_227148_1_) -> {
-            throw new JsonSyntaxException("Block " + block + " has no property " + p_227148_1_);
+         statepropertiespredicate.forEachNotPresent(block.getStateContainer(), (propertyName) -> {
+            throw new JsonSyntaxException("Block " + block + " has no property " + propertyName);
          });
       }
 
@@ -44,8 +44,8 @@ public class SlideDownBlockTrigger extends AbstractCriterionTrigger<SlideDownBlo
    }
 
    public void test(ServerPlayerEntity player, BlockState state) {
-      this.triggerListeners(player, (p_227149_1_) -> {
-         return p_227149_1_.test(state);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(state);
       });
    }
 
