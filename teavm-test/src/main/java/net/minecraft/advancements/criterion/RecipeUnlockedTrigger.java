@@ -21,8 +21,8 @@ public class RecipeUnlockedTrigger extends AbstractCriterionTrigger<RecipeUnlock
    }
 
    public void trigger(ServerPlayerEntity player, IRecipe<?> recipe) {
-      this.triggerListeners(player, (p_227018_1_) -> {
-         return p_227018_1_.test(recipe);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(recipe);
       });
    }
 
