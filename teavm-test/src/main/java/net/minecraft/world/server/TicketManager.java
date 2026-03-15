@@ -6,7 +6,6 @@ import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.longs.Long2ByteMap;
 import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
-import it.unimi.dsi.fastutil.longs.Long2IntMaps;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -118,7 +117,7 @@ public abstract class TicketManager {
                   }
 
                   CompletableFuture<Either<Chunk, ChunkHolder.IChunkLoadingError>> completablefuture = chunkholder.getEntityTickingFuture();
-                  completablefuture.thenAccept((p_219363_3_) -> {
+                  completableFuture.thenAccept((p_219363_3_) -> {
                      this.field_219388_p.execute(() -> {
                         this.field_219386_n.enqueue(ChunkTaskPriorityQueueSorter.func_219073_a(() -> {
                         }, j, false));
@@ -328,7 +327,12 @@ public abstract class TicketManager {
 
    class PlayerTicketTracker extends TicketManager.PlayerChunkTracker {
       private int viewDistance;
-      private final Long2IntMap field_215513_f = Long2IntMaps.synchronize(new Long2IntOpenHashMap());
+      
+      // TEAVM Modification: Removed Long2IntMaps.synchronize(...)
+      // JavaScript execution environments are inherently single-threaded (no true concurrency on the same objects).
+      // Synchronized wrappers add unnecessary memory & performance overhead and can cause compilation trouble.
+      private final Long2IntMap field_215513_f = new Long2IntOpenHashMap();
+      
       private final LongSet field_215514_g = new LongOpenHashSet();
 
       protected PlayerTicketTracker(int p_i50682_2_) {
