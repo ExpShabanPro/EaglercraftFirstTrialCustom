@@ -63,8 +63,8 @@ public class StatePropertiesPredicate {
    }
 
    public void forEachNotPresent(StateContainer<?, ?> properties, Consumer<String> stringConsumer) {
-      this.matchers.forEach((p_227184_2_) -> {
-         p_227184_2_.runIfNotPresent(properties, stringConsumer);
+      this.matchers.forEach((matcher) -> {
+         matcher.runIfNotPresent(properties, stringConsumer);
       });
    }
 
@@ -89,8 +89,8 @@ public class StatePropertiesPredicate {
       } else {
          JsonObject jsonobject = new JsonObject();
          if (!this.matchers.isEmpty()) {
-            this.matchers.forEach((p_227187_1_) -> {
-               jsonobject.add(p_227187_1_.getPropertyName(), p_227187_1_.toJsonElement());
+            this.matchers.forEach((matcher) -> {
+               jsonobject.add(matcher.getPropertyName(), matcher.toJsonElement());
             });
          }
 
@@ -174,7 +174,6 @@ public class StatePropertiesPredicate {
          if (property == null) {
             propertyConsumer.accept(this.propertyName);
          }
-
       }
    }
 
