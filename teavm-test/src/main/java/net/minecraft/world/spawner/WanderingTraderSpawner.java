@@ -41,7 +41,6 @@ public class WanderingTraderSpawner implements ISpecialSpawner {
          this.field_221250_e = 25;
          p_i231576_1_.setWanderingTraderSpawnChance(this.field_221250_e);
       }
-
    }
 
    public int func_230253_a_(ServerWorld p_230253_1_, boolean p_230253_2_, boolean p_230253_3_) {
