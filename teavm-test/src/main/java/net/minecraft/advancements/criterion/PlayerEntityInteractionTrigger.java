@@ -24,8 +24,8 @@ public class PlayerEntityInteractionTrigger extends AbstractCriterionTrigger<Pla
 
    public void test(ServerPlayerEntity player, ItemStack stack, Entity entity) {
       LootContext lootcontext = EntityPredicate.getLootContext(player, entity);
-      this.triggerListeners(player, (p_241475_2_) -> {
-         return p_241475_2_.test(stack, lootcontext);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(stack, lootcontext);
       });
    }
 
@@ -44,7 +44,11 @@ public class PlayerEntityInteractionTrigger extends AbstractCriterionTrigger<Pla
       }
 
       public boolean test(ItemStack stack, LootContext context) {
-         return !this.stack.test(stack) ? false : this.entity.testContext(context);
+         if (!this.stack.test(stack)) {
+            return false;
+         } else {
+            return this.entity.testContext(context);
+         }
       }
 
       public JsonObject serialize(ConditionArraySerializer conditions) {
