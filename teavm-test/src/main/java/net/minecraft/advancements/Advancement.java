@@ -25,8 +25,6 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentUtils;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.HoverEvent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class Advancement {
@@ -61,7 +59,6 @@ public class Advancement {
          });
          this.displayText = TextComponentUtils.wrapWithSquareBrackets(itextcomponent2).mergeStyle(textformatting);
       }
-
    }
 
    public Advancement.Builder copy() {
@@ -94,7 +91,6 @@ public class Advancement {
       return this.criteria;
    }
 
-   @OnlyIn(Dist.CLIENT)
    public int getRequirementCount() {
       return this.requirements.length;
    }
@@ -301,7 +297,6 @@ public class Advancement {
                buf.writeString(s);
             }
          }
-
       }
 
       public String toString() {
