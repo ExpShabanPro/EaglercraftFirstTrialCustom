@@ -23,8 +23,8 @@ public class NetherTravelTrigger extends AbstractCriterionTrigger<NetherTravelTr
    }
 
    public void trigger(ServerPlayerEntity player, Vector3d enteredNetherPosition) {
-      this.triggerListeners(player, (p_226945_2_) -> {
-         return p_226945_2_.test(player.getServerWorld(), enteredNetherPosition, player.getPosX(), player.getPosY(), player.getPosZ());
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(player.getServerWorld(), enteredNetherPosition, player.getPosX(), player.getPosY(), player.getPosZ());
       });
    }
 
