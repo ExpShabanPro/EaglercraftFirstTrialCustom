@@ -45,6 +45,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class CriteriaTriggers {
    private static final Map<ResourceLocation, ICriterionTrigger<?>> REGISTRY = Maps.newHashMap();
+   
    public static final ImpossibleTrigger IMPOSSIBLE = register(new ImpossibleTrigger());
    public static final KilledTrigger PLAYER_KILLED_ENTITY = register(new KilledTrigger(new ResourceLocation("player_killed_entity")));
    public static final KilledTrigger ENTITY_KILLED_PLAYER = register(new KilledTrigger(new ResourceLocation("entity_killed_player")));
@@ -88,6 +89,12 @@ public class CriteriaTriggers {
    public static final ThrownItemPickedUpByEntityTrigger THROWN_ITEM_PICKED_UP_BY_ENTITY = register(new ThrownItemPickedUpByEntityTrigger());
    public static final PlayerEntityInteractionTrigger PLAYER_ENTITY_INTERACTION = register(new PlayerEntityInteractionTrigger());
 
+   /**
+    * Registers a new criterion trigger to the internal registry.
+    * * @param criterion The trigger instance to register.
+    * @return The registered trigger.
+    * @throws IllegalArgumentException if the ID is already registered.
+    */
    private static <T extends ICriterionTrigger<?>> T register(T criterion) {
       if (REGISTRY.containsKey(criterion.getId())) {
          throw new IllegalArgumentException("Duplicate criterion id " + criterion.getId());
@@ -97,11 +104,18 @@ public class CriteriaTriggers {
       }
    }
 
+   /**
+    * Retrieves a trigger by its ResourceLocation.
+    */
    @Nullable
+   @SuppressWarnings("unchecked")
    public static <T extends ICriterionInstance> ICriterionTrigger<T> get(ResourceLocation id) {
       return (ICriterionTrigger<T>) REGISTRY.get(id);
    }
 
+   /**
+    * Returns an iterable of all registered triggers.
+    */
    public static Iterable<? extends ICriterionTrigger<?>> getAll() {
       return REGISTRY.values();
    }
