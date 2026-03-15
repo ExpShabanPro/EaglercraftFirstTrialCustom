@@ -19,7 +19,16 @@ public final class Ticket<T> implements Comparable<Ticket<?>> {
       if (i != 0) {
          return i;
       } else {
-         int j = Integer.compare(System.identityHashCode(this.type), System.identityHashCode(p_compareTo_1_.type));
+         // TEAVM Modification: Replaced System.identityHashCode with deterministic string comparison.
+         // JS environments do not handle memory-address-based identity hash codes well, which can 
+         // break determinism in chunk ticket sorting.
+         int j = this.type == p_compareTo_1_.type ? 0 : this.type.toString().compareTo(p_compareTo_1_.type.toString());
+         
+         // Fallback to ensure symmetric comparison if two different TicketTypes somehow share a toString()
+         if (j == 0 && this.type != p_compareTo_1_.type) {
+             j = Integer.compare(this.type.hashCode(), p_compareTo_1_.type.hashCode());
+         }
+         
          return j != 0 ? j : this.type.getComparator().compare(this.value, (T)p_compareTo_1_.value);
       }
    }
