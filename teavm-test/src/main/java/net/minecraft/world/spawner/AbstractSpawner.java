@@ -122,7 +122,12 @@ public abstract class AbstractSpawner {
                         return;
                      }
 
-                     int k = world.getEntitiesWithinAABB(entity.getClass(), (new AxisAlignedBB((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), (double)(blockpos.getX() + 1), (double)(blockpos.getY() + 1), (double)(blockpos.getZ() + 1))).grow((double)this.spawnRange)).size();
+                     // TEAVM Modification: Explicit cast to Class<? extends Entity>
+                     // Prevents generic capture-of errors in strict javac environments that TeaVM uses.
+                     @SuppressWarnings("unchecked")
+                     Class<? extends Entity> entityClass = (Class<? extends Entity>) entity.getClass();
+                     int k = world.getEntitiesWithinAABB(entityClass, (new AxisAlignedBB((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), (double)(blockpos.getX() + 1), (double)(blockpos.getY() + 1), (double)(blockpos.getZ() + 1))).grow((double)this.spawnRange)).size();
+                     
                      if (k >= this.maxNearbyEntities) {
                         this.resetTimer();
                         return;
@@ -249,6 +254,7 @@ public abstract class AbstractSpawner {
       if (this.cachedEntity == null) {
          this.cachedEntity = EntityType.loadEntityAndExecute(this.spawnData.getNbt(), this.getWorld(), Function.identity());
          if (this.spawnData.getNbt().size() == 1 && this.spawnData.getNbt().contains("id", 8) && this.cachedEntity instanceof MobEntity) {
+             // Empty block intended by default 1.16.5 obfuscator/compiler behavior.
          }
       }
 
