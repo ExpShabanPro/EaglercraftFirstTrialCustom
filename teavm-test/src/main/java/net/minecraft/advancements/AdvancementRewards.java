@@ -39,13 +39,18 @@ public class AdvancementRewards {
 
    public void apply(ServerPlayerEntity player) {
       player.giveExperiencePoints(this.experience);
-      LootContext lootcontext = (new LootContext.Builder(player.getServerWorld())).withParameter(LootParameters.THIS_ENTITY, player).withParameter(LootParameters.field_237457_g_, player.getPositionVec()).withRandom(player.getRNG()).build(LootParameterSets.ADVANCEMENT);
+      LootContext lootcontext = (new LootContext.Builder(player.getServerWorld()))
+            .withParameter(LootParameters.THIS_ENTITY, player)
+            .withParameter(LootParameters.ORIGIN, player.getPositionVec())
+            .withRandom(player.getRNG())
+            .build(LootParameterSets.ADVANCEMENT);
+      
       boolean flag = false;
 
-      for(ResourceLocation resourcelocation : this.loot) {
-         for(ItemStack itemstack : player.server.getLootTableManager().getLootTableFromLocation(resourcelocation).generate(lootcontext)) {
+      for (ResourceLocation resourcelocation : this.loot) {
+         for (ItemStack itemstack : player.server.getLootTableManager().getLootTableFromLocation(resourcelocation).generate(lootcontext)) {
             if (player.addItemStackToInventory(itemstack)) {
-               player.world.playSound((PlayerEntity)null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, ((player.getRNG().nextFloat() - player.getRNG().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+               player.world.playSound((PlayerEntity) null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, ((player.getRNG().nextFloat() - player.getRNG().nextFloat()) * 0.7F + 1.0F) * 2.0F);
                flag = true;
             } else {
                ItemEntity itementity = player.dropItem(itemstack, false);
@@ -66,13 +71,14 @@ public class AdvancementRewards {
       }
 
       MinecraftServer minecraftserver = player.server;
-      this.function.func_218039_a(minecraftserver.getFunctionManager()).ifPresent((p_215098_2_) -> {
-         minecraftserver.getFunctionManager().execute(p_215098_2_, player.getCommandSource().withFeedbackDisabled().withPermissionLevel(2));
+      this.function.getFunction(minecraftserver.getFunctionManager()).ifPresent((resolvedFunction) -> {
+         minecraftserver.getFunctionManager().execute(resolvedFunction, player.getCommandSource().withFeedbackDisabled().withPermissionLevel(2));
       });
    }
 
+   @Override
    public String toString() {
-      return "AdvancementRewards{experience=" + this.experience + ", loot=" + Arrays.toString((Object[])this.loot) + ", recipes=" + Arrays.toString((Object[])this.recipes) + ", function=" + this.function + '}';
+      return "AdvancementRewards{experience=" + this.experience + ", loot=" + Arrays.toString(this.loot) + ", recipes=" + Arrays.toString(this.recipes) + ", function=" + this.function + '}';
    }
 
    public JsonElement serialize() {
@@ -86,21 +92,17 @@ public class AdvancementRewards {
 
          if (this.loot.length > 0) {
             JsonArray jsonarray = new JsonArray();
-
-            for(ResourceLocation resourcelocation : this.loot) {
+            for (ResourceLocation resourcelocation : this.loot) {
                jsonarray.add(resourcelocation.toString());
             }
-
             jsonobject.add("loot", jsonarray);
          }
 
          if (this.recipes.length > 0) {
             JsonArray jsonarray1 = new JsonArray();
-
-            for(ResourceLocation resourcelocation1 : this.recipes) {
+            for (ResourceLocation resourcelocation1 : this.recipes) {
                jsonarray1.add(resourcelocation1.toString());
             }
-
             jsonobject.add("recipes", jsonarray1);
          }
 
@@ -113,29 +115,28 @@ public class AdvancementRewards {
    }
 
    public static AdvancementRewards deserializeRewards(JsonObject json) throws JsonParseException {
-      int i = JSONUtils.getInt(json, "experience", 0);
-      JsonArray jsonarray = JSONUtils.getJsonArray(json, "loot", new JsonArray());
-      ResourceLocation[] aresourcelocation = new ResourceLocation[jsonarray.size()];
-
-      for(int j = 0; j < aresourcelocation.length; ++j) {
-         aresourcelocation[j] = new ResourceLocation(JSONUtils.getString(jsonarray.get(j), "loot[" + j + "]"));
+      int exp = JSONUtils.getInt(json, "experience", 0);
+      
+      JsonArray lootArray = JSONUtils.getJsonArray(json, "loot", new JsonArray());
+      ResourceLocation[] lootLocations = new ResourceLocation[lootArray.size()];
+      for (int i = 0; i < lootLocations.length; ++i) {
+         lootLocations[i] = new ResourceLocation(JSONUtils.getString(lootArray.get(i), "loot[" + i + "]"));
       }
 
-      JsonArray jsonarray1 = JSONUtils.getJsonArray(json, "recipes", new JsonArray());
-      ResourceLocation[] aresourcelocation1 = new ResourceLocation[jsonarray1.size()];
-
-      for(int k = 0; k < aresourcelocation1.length; ++k) {
-         aresourcelocation1[k] = new ResourceLocation(JSONUtils.getString(jsonarray1.get(k), "recipes[" + k + "]"));
+      JsonArray recipeArray = JSONUtils.getJsonArray(json, "recipes", new JsonArray());
+      ResourceLocation[] recipeLocations = new ResourceLocation[recipeArray.size()];
+      for (int i = 0; i < recipeLocations.length; ++i) {
+         recipeLocations[i] = new ResourceLocation(JSONUtils.getString(recipeArray.get(i), "recipes[" + i + "]"));
       }
 
-      FunctionObject.CacheableFunction functionobject$cacheablefunction;
+      FunctionObject.CacheableFunction cacheableFunction;
       if (json.has("function")) {
-         functionobject$cacheablefunction = new FunctionObject.CacheableFunction(new ResourceLocation(JSONUtils.getString(json, "function")));
+         cacheableFunction = new FunctionObject.CacheableFunction(new ResourceLocation(JSONUtils.getString(json, "function")));
       } else {
-         functionobject$cacheablefunction = FunctionObject.CacheableFunction.EMPTY;
+         cacheableFunction = FunctionObject.CacheableFunction.EMPTY;
       }
 
-      return new AdvancementRewards(i, aresourcelocation, aresourcelocation1, functionobject$cacheablefunction);
+      return new AdvancementRewards(exp, lootLocations, recipeLocations, cacheableFunction);
    }
 
    public static class Builder {
@@ -164,7 +165,12 @@ public class AdvancementRewards {
       }
 
       public AdvancementRewards build() {
-         return new AdvancementRewards(this.experience, this.loot.toArray(new ResourceLocation[0]), this.recipes.toArray(new ResourceLocation[0]), this.function == null ? FunctionObject.CacheableFunction.EMPTY : new FunctionObject.CacheableFunction(this.function));
+         return new AdvancementRewards(
+               this.experience, 
+               this.loot.toArray(new ResourceLocation[0]), 
+               this.recipes.toArray(new ResourceLocation[0]), 
+               this.function == null ? FunctionObject.CacheableFunction.EMPTY : new FunctionObject.CacheableFunction(this.function)
+         );
       }
    }
 }
