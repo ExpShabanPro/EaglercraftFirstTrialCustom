@@ -1,3 +1,10 @@
+// ==============================================================================
+// ⚠️ PASTE "PART 1" HERE
+// NOTE: When pasting Part 1, be sure to remove the following imports if present:
+// import java.io.IOException;
+// import java.io.Writer;
+// import java.nio.file.Files;
+// import java.nio.file.Path;
 package net.minecraft.world.server;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -14,10 +21,6 @@ import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -488,6 +491,9 @@ public class ServerWorld extends World implements ISeedReader {
          }
       }
 
+// ==============================================================================
+
+      // --- START OF PART 2 ---
       iprofiler.endStartSection("tickBlocks");
       if (randomTickSpeed > 0) {
          for(ChunkSection chunksection : chunkIn.getSections()) {
@@ -970,6 +976,8 @@ public class ServerWorld extends World implements ISeedReader {
       this.server.getPlayerList().sendPacketToAllPlayers(new SPlaySoundEventPacket(id, pos, data, true));
    }
 
+   // --- START OF PART 3 ---
+
    public void playEvent(@Nullable PlayerEntity player, int type, BlockPos pos, int data) {
       this.server.getPlayerList().sendToAllNearExcept(player, (double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), 64.0D, this.getDimensionKey(), new SPlaySoundEventPacket(type, pos, data, false));
    }
@@ -1256,6 +1264,11 @@ public class ServerWorld extends World implements ISeedReader {
       host.updateReputation(type, target);
    }
 
+   // =========================================================================================
+   // TEAVM MODIFICATIONS: Commented out methods that rely on java.nio.file.* and java.io.Writer
+   // These cause NoClassDefFoundError in TeaVM because it cannot emulate local filesystems.
+   // =========================================================================================
+   /*
    public void writeDebugInfo(Path pathIn) throws IOException {
       ChunkManager chunkmanager = this.getChunkProvider().chunkManager;
 
@@ -1323,6 +1336,15 @@ public class ServerWorld extends World implements ISeedReader {
       }
 
    }
+   */
+
+   // Added empty stub to prevent caller compilation errors if it passes an Object/String instead.
+   // If the caller (e.g., MinecraftServer.java) also explicitly calls this with `Path`, you may
+   // need to comment out the call there entirely.
+   public void writeDebugInfo(Object pathIn) {
+      // Ignored for TeaVM / Web browser compatibility
+   }
+   // =========================================================================================
 
    @VisibleForTesting
    public void clearBlockEvents(MutableBoundingBox boundingBox) {
