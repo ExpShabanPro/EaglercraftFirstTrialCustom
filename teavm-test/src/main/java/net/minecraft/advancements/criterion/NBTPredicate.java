@@ -59,6 +59,9 @@ public class NBTPredicate {
       }
    }
 
+   /**
+    * Writes the entity to NBT and, if it's a player, adds the currently selected item to the NBT for testing.
+    */
    public static CompoundNBT writeToNBTWithSelectedItem(Entity entityIn) {
       CompoundNBT compoundnbt = entityIn.writeWithoutTypeId(new CompoundNBT());
       if (entityIn instanceof PlayerEntity) {
