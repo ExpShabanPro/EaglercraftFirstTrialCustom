@@ -20,8 +20,8 @@ public class PlayerGeneratesContainerLootTrigger extends AbstractCriterionTrigge
    }
 
    public void test(ServerPlayerEntity player, ResourceLocation generatedLoot) {
-      this.triggerListeners(player, (p_235477_1_) -> {
-         return p_235477_1_.test(generatedLoot);
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(generatedLoot);
       });
    }
 
