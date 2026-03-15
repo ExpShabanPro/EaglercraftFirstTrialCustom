@@ -30,28 +30,30 @@ public class AdvancementManager extends JsonReloadListener {
       this.lootPredicateManager = lootPredicateManager;
    }
 
+   @Override
    protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
       Map<ResourceLocation, Advancement.Builder> map = Maps.newHashMap();
-      objectIn.forEach((p_240923_2_, p_240923_3_) -> {
+      
+      objectIn.forEach((id, jsonElement) -> {
          try {
-            JsonObject jsonobject = JSONUtils.getJsonObject(p_240923_3_, "advancement");
-            Advancement.Builder advancement$builder = Advancement.Builder.deserialize(jsonobject, new ConditionArrayParser(p_240923_2_, this.lootPredicateManager));
-            map.put(p_240923_2_, advancement$builder);
+            JsonObject jsonobject = JSONUtils.getJsonObject(jsonElement, "advancement");
+            Advancement.Builder builder = Advancement.Builder.deserialize(jsonobject, new ConditionArrayParser(id, this.lootPredicateManager));
+            map.put(id, builder);
          } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
-            LOGGER.error("Parsing error loading custom advancement {}: {}", p_240923_2_, jsonparseexception.getMessage());
+            LOGGER.error("Parsing error loading custom advancement {}: {}", id, jsonparseexception.getMessage());
          }
-
       });
-      AdvancementList advancementlist = new AdvancementList();
-      advancementlist.loadAdvancements(map);
 
-      for(Advancement advancement : advancementlist.getRoots()) {
-         if (advancement.getDisplay() != null) {
-            AdvancementTreeNode.layout(advancement);
+      AdvancementList newAdvancementList = new AdvancementList();
+      newAdvancementList.loadAdvancements(map);
+
+      for (Advancement root : newAdvancementList.getRoots()) {
+         if (root.getDisplay() != null) {
+            AdvancementTreeNode.layout(root);
          }
       }
 
-      this.advancementList = advancementlist;
+      this.advancementList = newAdvancementList;
    }
 
    @Nullable
