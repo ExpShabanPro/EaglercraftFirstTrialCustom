@@ -18,12 +18,15 @@ public class UsedEnderEyeTrigger extends AbstractCriterionTrigger<UsedEnderEyeTr
       return new UsedEnderEyeTrigger.Instance(entityPredicate, minmaxbounds$floatbound);
    }
 
+   /**
+    * Triggers the criterion for the player based on their distance to the target block position.
+    */
    public void trigger(ServerPlayerEntity player, BlockPos pos) {
       double d0 = player.getPosX() - (double)pos.getX();
       double d1 = player.getPosZ() - (double)pos.getZ();
-      double d2 = d0 * d0 + d1 * d1;
-      this.triggerListeners(player, (p_227325_2_) -> {
-         return p_227325_2_.test(d2);
+      double d2 = d0 * d0 + d1 * d1; // Squared horizontal distance
+      this.triggerListeners(player, (instance) -> {
+         return instance.test(d2);
       });
    }
 
