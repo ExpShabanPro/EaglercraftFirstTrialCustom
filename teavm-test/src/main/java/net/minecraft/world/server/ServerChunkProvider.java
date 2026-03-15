@@ -1,11 +1,10 @@
 package net.minecraft.world.server;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Either;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -341,7 +340,11 @@ public class ServerChunkProvider extends AbstractChunkProvider {
          WorldEntitySpawner.EntityDensityManager worldentityspawner$entitydensitymanager = WorldEntitySpawner.func_234964_a_(l, this.world.func_241136_z_(), this::func_241098_a_);
          this.field_241097_p_ = worldentityspawner$entitydensitymanager;
          this.world.getProfiler().endSection();
-         List<ChunkHolder> list = Lists.newArrayList(this.chunkManager.getLoadedChunksIterable());
+         
+         // TeaVM Optimization: Replaced Guava's Lists.newArrayList
+         List<ChunkHolder> list = new ArrayList<>();
+         this.chunkManager.getLoadedChunksIterable().forEach(list::add);
+         
          Collections.shuffle(list);
          list.forEach((p_241099_7_) -> {
             Optional<Chunk> optional = p_241099_7_.getTickingFuture().getNow(ChunkHolder.UNLOADED_CHUNK).left();
@@ -388,7 +391,8 @@ public class ServerChunkProvider extends AbstractChunkProvider {
       return "ServerChunkCache: " + this.getLoadedChunkCount();
    }
 
-   @VisibleForTesting
+   // TeaVM Optimization: Removed Guava @VisibleForTesting
+   // @VisibleForTesting
    public int func_225314_f() {
       return this.executor.getQueueSize();
    }
