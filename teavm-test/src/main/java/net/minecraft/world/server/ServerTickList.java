@@ -1,10 +1,10 @@
 package net.minecraft.world.server;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
@@ -31,11 +31,11 @@ import net.minecraft.world.TickPriority;
 public class ServerTickList<T> implements ITickList<T> {
    protected final Predicate<T> filter;
    private final Function<T, ResourceLocation> serializer;
-   private final Set<NextTickListEntry<T>> pendingTickListEntriesHashSet = Sets.newHashSet();
-   private final TreeSet<NextTickListEntry<T>> pendingTickListEntriesTreeSet = Sets.newTreeSet(NextTickListEntry.func_223192_a());
+   private final Set<NextTickListEntry<T>> pendingTickListEntriesHashSet = new HashSet<>();
+   private final TreeSet<NextTickListEntry<T>> pendingTickListEntriesTreeSet = new TreeSet<>(NextTickListEntry.func_223192_a());
    private final ServerWorld world;
-   private final Queue<NextTickListEntry<T>> pendingTickListEntriesThisTick = Queues.newArrayDeque();
-   private final List<NextTickListEntry<T>> entriesRunThisTick = Lists.newArrayList();
+   private final Queue<NextTickListEntry<T>> pendingTickListEntriesThisTick = new ArrayDeque<>();
+   private final List<NextTickListEntry<T>> entriesRunThisTick = new ArrayList<>();
    private final Consumer<NextTickListEntry<T>> tickFunction;
 
    public ServerTickList(ServerWorld p_i231625_1_, Predicate<T> p_i231625_2_, Function<T, ResourceLocation> p_i231625_3_, Consumer<NextTickListEntry<T>> p_i231625_4_) {
@@ -136,7 +136,7 @@ public class ServerTickList<T> implements ITickList<T> {
             }
 
             if (result == null) {
-               result = Lists.newArrayList();
+               result = new ArrayList<>();
             }
 
             result.add(nextticklistentry);
